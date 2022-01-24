@@ -150,18 +150,21 @@ for (let brandname in brands){
 // 1. For each brand, sort the products by price, from highest to lowest
 // 2. Log the sort
 
-for (const i in brands)
-{
-  let sorBrandbyPrice = sortByPrice(brands[i]).reverse();
-}
+console.log("Products sorted by price (highest to lowest)\n");
+for (const i in brands) {
+    let sortBrandByPrice = sortByPrice(brands[i]).reverse();
+    console.table(sortBrandByPrice);
+};
 
 // 🎯 TODO: Sort by date for each brand
 // 1. For each brand, sort the products by date, from old to recent
 // 2. Log the sort
 
-
-
-
+console.log("Products sorted by date (old to recent)\n");
+for (const i in brands) {
+    let sortBrandByDate = sortByDate(brands[i]).reverse();
+    console.table(sortBrandByDate);
+};
 
 /**
  * 💶
@@ -174,7 +177,25 @@ for (const i in brands)
 // 1. Compute the p90 price value of each brand
 // The p90 value (90th percentile) is the lower value expected to be exceeded in 90% of the products
 
+function calcP90(list) {
+  let sortBrandByPrice = sortByPrice(list).reverse();
+  const p90 = Math.round(0.90 * list.length);
+  let j = 0;
+  while (j != p90) {
+      j += 1;
+  }
+  return (sortBrandByPrice[j]);
+}
+let p90Adresse = calcP90(adresseList);
+let p90Loom = calcP90(loomList);
+let p901083 = calcP90(milleQVTroisList);
+let p90Dedicated = calcP90(dedicatedList);
+let p90Aatise = calcP90(aatiseList);
 
+
+console.table("p90 value of each brand :\n" + "Adresse : " + Object.values(p90Adresse) +
+  "\nLoom : " + Object.values(p90Loom) + "\n1083 : " + Object.values(p901083) + "\nDedicated : " +
+  Object.values(p90Dedicated) + "\nAatise : " + Object.values(p90Aatise));
 
 
 
@@ -250,20 +271,45 @@ const COTELE_PARIS = [
 // // 1. Log if we have new products only (true or false)
 // // A new product is a product `released` less than 2 weeks.
 
+let newProductCount = 0;  
+let newReleasedProducts = false;
+let date = new Date();
+let currDate = date.toISOString().split('T')[0]; 
+for (const i in COTELE_PARIS) {
+    var difference = Math.abs(currDate - COTELE_PARIS[i].released);
+    const days = difference / (1000 * 3600 * 24)
+    if (days < 14) newProductCount += 1;
+};
+if (newProductCount == COTELE_PARIS.length) newReleasedProducts = true;
+console.log("New released products : " + newReleasedProducts);
 
 // 🎯 TODO: Reasonable price
 // // 1. Log if coteleparis is a reasonable price shop (true or false)
 // // A reasonable price if all the products are less than 100€
+
+let productsUnder100 = 0;
+let reasonable = false;
+for (const i in COTELE_PARIS) {
+    if (COTELE_PARIS[i].price < 100) productsUnder100 += 1;
+}
+if (productsUnder100 == COTELE_PARIS.length) reasonable = true;
+console.log("Reasonable price : " + reasonable);
 
 
 // 🎯 TODO: Find a specific product
 // 1. Find the product with the uuid `b56c6d88-749a-5b4c-b571-e5b5c6483131`
 // 2. Log the product
 
+let product = COTELE_PARIS.find(item => item.uuid =='b56c6d88-749a-5b4c-b571-e5b5c6483131');
+console.log(product);
 
 // 🎯 TODO: Delete a specific product
 // 1. Delete the product with the uuid `b56c6d88-749a-5b4c-b571-e5b5c6483131`
 // 2. Log the new list of product
+
+const index = COTELE_PARIS.indexOf(product);
+COTELE_PARIS.splice(index, 1);
+console.log(COTELE_PARIS);
 
 // 🎯 TODO: Save the favorite product
 let blueJacket = {
@@ -280,6 +326,8 @@ jacket.favorite = true;
 
 // 1. Log `blueJacket` and `jacket` variables
 // 2. What do you notice?
+console.log(blueJacket);
+console.log(jacket);
 
 blueJacket = {
   'link': 'https://coteleparis.com/collections/tous-les-produits-cotele/products/la-veste-bleu-roi',
@@ -289,7 +337,10 @@ blueJacket = {
 
 // 3. Update `jacket` property with `favorite` to true WITHOUT changing blueJacket properties
 
-
+jacket = Object.assign({}, blueJacket);
+jacket.favorite = true;
+console.log(blueJacket);
+console.log(jacket);
 
 
 
@@ -302,3 +353,4 @@ blueJacket = {
 // 🎯 TODO: Save in localStorage
 // 1. Save MY_FAVORITE_BRANDS in the localStorage
 // 2. log the localStorage
+
