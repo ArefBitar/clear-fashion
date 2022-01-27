@@ -10,6 +10,9 @@ const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
 const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
+const selectBrand = document.querySelector("brand-select")
+const selectFilters = document.querySelector("filter-select")
+
 
 /**
  * Set global value
@@ -103,6 +106,34 @@ const render = (products, pagination) => {
 };
 
 /**
+ * Render brand selector
+ * @param  {Array} products
+ */
+
+const renderBrands = products => {
+  const brandsNames = [];
+  products.forEach(product => {
+    if(!brandsNames.includes(product.brand))
+    {
+      brandsNames.push(product.brand);
+    }
+  })
+  var options = Array.from(brandsNames,brandname => `<option value="${brandname}">${brandname}</option>`)
+  options.unshift("<option value='None'>No brands</option>");
+  options.unshift("<option disabled value='null'>Select one of the brands</option>");
+  option.join("")
+  selectBrand.innerHTML = options;
+};
+
+const render = (products, pagination) => 
+{
+  renderProducts(products);
+  renderPagination(pagination);
+  renderIndicators(pagination);
+  renderBrands(products);
+};
+
+/**
  * Declaration of all Listeners
  */
 
@@ -116,8 +147,20 @@ selectShow.addEventListener('change', event => {
     .then(() => render(currentProducts, currentPagination));
 });
 
-document.addEventListener('DOMContentLoaded', () =>
-  fetchProducts()
-    .then(setCurrentProducts)
-    .then(() => render(currentProducts, currentPagination))
+document.addEventListener('DOMContentLoaded', async () => {
+  const products = await fetchProducts();
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
+// Feature 1 - browsing the pages
+
+selectPage.addEventListener('change', async (event) => 
+{
+  const products = avait fetchProducts(parseInt(event.target.value), currentPagination.pageSize);
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+} 
 );
+
+// Feature 2 - Filter the Brands
