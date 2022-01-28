@@ -1,18 +1,17 @@
 // Invoking strict mode https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode#invoking_strict_mode
+
 'use strict';
 
 // current products on the page
 let currentProducts = [];
 let currentPagination = {};
 
-// inititiqte selectors
+// initiate selectors
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
 const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
-const selectBrand = document.querySelector("brand-select")
-const selectFilters = document.querySelector("filter-select")
-
+const selectProductsByBrand = document.querySelector('#brand-select');
 
 /**
  * Set global value
@@ -33,7 +32,7 @@ const setCurrentProducts = ({result, meta}) => {
 const fetchProducts = async (page = 1, size = 12) => {
   try {
     const response = await fetch(
-      `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
+      'https://clear-fashion-api.vercel.app?page=${page}&size=${size}'
     );
     const body = await response.json();
 
@@ -82,7 +81,7 @@ const renderPagination = pagination => {
   const {currentPage, pageCount} = pagination;
   const options = Array.from(
     {'length': pageCount},
-    (value, index) => `<option value="${index + 1}">${index + 1}</option>`
+    (value, index) => <option value="${index + 1}">${index + 1}</option>
   ).join('');
 
   selectPage.innerHTML = options;
@@ -106,34 +105,6 @@ const render = (products, pagination) => {
 };
 
 /**
- * Render brand selector
- * @param  {Array} products
- */
-
-const renderBrands = products => {
-  const brandsNames = [];
-  products.forEach(product => {
-    if(!brandsNames.includes(product.brand))
-    {
-      brandsNames.push(product.brand);
-    }
-  })
-  var options = Array.from(brandsNames,brandname => `<option value="${brandname}">${brandname}</option>`)
-  options.unshift("<option value='None'>No brands</option>");
-  options.unshift("<option disabled value='null'>Select one of the brands</option>");
-  option.join("")
-  selectBrand.innerHTML = options;
-};
-
-const render = (products, pagination) => 
-{
-  renderProducts(products);
-  renderPagination(pagination);
-  renderIndicators(pagination);
-  renderBrands(products);
-};
-
-/**
  * Declaration of all Listeners
  */
 
@@ -149,18 +120,17 @@ selectShow.addEventListener('change', event => {
 
 document.addEventListener('DOMContentLoaded', async () => {
   const products = await fetchProducts();
+
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
 
-// Feature 1 - browsing the pages
 
-selectPage.addEventListener('change', async (event) => 
-{
-  const products = avait fetchProducts(parseInt(event.target.value), currentPagination.pageSize);
-  setCurrentProducts(products);
-  render(currentProducts, currentPagination);
-} 
-);
+// Feature 1 - Browse pages 
 
-// Feature 2 - Filter the Brands
+selectPage.addEventListener('change', event => {
+        fetchProducts(parseInt(event.target.value), selectShow.value)
+        .then(setCurrentProducts)
+        .then(() => render(currentProducts, currentPagination));
+    // à compléter !
+});
