@@ -57,7 +57,7 @@ console.log(lengthMarketPlace)
 // 3. Log how many brands we have
 
 const brandsName = [];
-marketplace.forEach(product => brandsNAme.push(product.brand))
+marketplace.forEach(product => brandsName.push(product.brand))
 console.log(brandsName)
 const brandsNamesUnique = new Set(brandsName)
 console.log("Number of brands : " + brandsNamesUnique.length);
@@ -82,9 +82,9 @@ function sortByDate(items) {
   return items.sort(function (a, b) {
       return new Date(a.date) - new Date(b.date);
   });}
-const sortByDate = sortByDate(marketplace);
+let sortDate = sortByDate(marketplace);
 console.log("Sort by date : ");
-console.table(sortByDate);
+console.table(sortDate);
 
 
 // 🎯 TODO: Filter a specific price range
@@ -99,7 +99,7 @@ marketplace.forEach(product => {
         produitRange.push(product);
     }
 });
-console.table(pdtBetw50and100);
+console.table(produitRange);
 
 // 🎯 TODO: Average price
 // 1. Determine the average price of the marketplace
@@ -141,9 +141,9 @@ for (let item of brandsNamesUnique){
   Brands[item] = marketplace.filter(product => product.brand == item);
 }
 
-console.log(brands);
-for (let brandname in brands){
-  console.log(brands[brandname].length);
+console.log(Brands);
+for (let brandname in Brands){
+  console.log(Brands[brandname].length);
 }
 
 // 🎯 TODO: Sort by price for each brand
@@ -151,8 +151,8 @@ for (let brandname in brands){
 // 2. Log the sort
 
 console.log("Products sorted by price (highest to lowest)\n");
-for (const i in brands) {
-    let sortBrandByPrice = sortByPrice(brands[i]).reverse();
+for (const i in Brands) {
+    let sortBrandByPrice = sortByPrice(Brands[i]).reverse();
     console.table(sortBrandByPrice);
 };
 
@@ -161,8 +161,8 @@ for (const i in brands) {
 // 2. Log the sort
 
 console.log("Products sorted by date (old to recent)\n");
-for (const i in brands) {
-    let sortBrandByDate = sortByDate(brands[i]).reverse();
+for (const i in Brands) {
+    let sortBrandByDate = sortByDate(Brands[i]).reverse();
     console.table(sortBrandByDate);
 };
 
@@ -186,18 +186,11 @@ function calcP90(list) {
   }
   return (sortBrandByPrice[j]);
 }
-let p90Adresse = calcP90(adresseList);
-let p90Loom = calcP90(loomList);
-let p901083 = calcP90(milleQVTroisList);
-let p90Dedicated = calcP90(dedicatedList);
-let p90Aatise = calcP90(aatiseList);
 
-
-console.table("p90 value of each brand :\n" + "Adresse : " + Object.values(p90Adresse) +
-  "\nLoom : " + Object.values(p90Loom) + "\n1083 : " + Object.values(p901083) + "\nDedicated : " +
-  Object.values(p90Dedicated) + "\nAatise : " + Object.values(p90Aatise));
-
-
+for (let brandname in Brands){
+  console.log(brandname)
+  console.log(calcP90(Brands[brandname]));
+}
 
 /**
  * 🧥
