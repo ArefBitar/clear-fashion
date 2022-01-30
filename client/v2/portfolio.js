@@ -1,18 +1,19 @@
 // Invoking strict mode https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode#invoking_strict_mode
-
 'use strict';
 
 // current products on the page
 let currentProducts = [];
 let currentPagination = {};
 
-// initiate selectors
+// instantiate the selectors
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
 const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
-const selectProductsByBrand = document.querySelector('#brand-select');
-
+const selectBrand = document.querySelector('#brand-select');
+const selectByReasonnablePrice = document.querySelector('#filter-reasonnable-price-select');
+const selectByRecentlyReleased = document.querySelector('#filter-recently-released-select');
+const selectSort = document.querySelector('#sort-select');
 /**
  * Set global value
  * @param {Array} result - products to display
@@ -32,7 +33,7 @@ const setCurrentProducts = ({result, meta}) => {
 const fetchProducts = async (page = 1, size = 12) => {
   try {
     const response = await fetch(
-      'https://clear-fashion-api.vercel.app?page=${page}&size=${size}'
+      `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
     );
     const body = await response.json();
 
@@ -81,7 +82,7 @@ const renderPagination = pagination => {
   const {currentPage, pageCount} = pagination;
   const options = Array.from(
     {'length': pageCount},
-    (value, index) => <option value="${index + 1}">${index + 1}</option>
+    (value, index) => `<option value="${index + 1}">${index + 1}</option>`
   ).join('');
 
   selectPage.innerHTML = options;
@@ -105,17 +106,40 @@ const render = (products, pagination) => {
 };
 
 /**
+ * Render brandselector
+ * @param {Array} products 
+ */
+
+ const renderBrands = products => {
+  const brandsNames = [];
+  products.forEach(product => {
+    if (!brandsNames.includes(product.brand)){
+      brandsNames.push(product.brand);
+    }
+  })
+  let options = ['<option value="select a brand">select a brand</option>']
+    options.push(Array.from(
+        { 'length': brandsNames.length },
+        (value, index) => `<option value="${brandsNames[index]}">${brandsNames[index]}</option>`
+    ).join(''));
+    options.push('<option value="show all brands">show all brands</option>')
+
+    selectBrand.innerHTML = options;
+};
+
+
+/**
  * Declaration of all Listeners
  */
 
 /**
  * Select the number of products to display
- * @type {[type]}
  */
-selectShow.addEventListener('change', event => {
-  fetchProducts(currentPagination.currentPage, parseInt(event.target.value))
-    .then(setCurrentProducts)
-    .then(() => render(currentProducts, currentPagination));
+selectShow.addEventListener('change', async (event) => {
+  const products = await fetchProducts(currentPagination.currentPage, parseInt(event.target.value));
+
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -125,11 +149,88 @@ document.addEventListener('DOMContentLoaded', async () => {
   render(currentProducts, currentPagination);
 });
 
+/** Feature 1 : Select the page to display
+ * 
+ */
 
-// Feature 1 - Browse pages 
+selectPage.addEventListener('change', event =>
+{
+  fetchProducts(ParseInt(event.target.value),currentPagination.pageSize)
+  .then(setCurrentProducts)
+  .then (() => render(currentProducts,currentPagination));
+});
 
-selectPage.addEventListener('change', event => {
-        fetchProducts(parseInt(event.target.value), selectShow.value)
-        .then(setCurrentProducts)
-        .then(() => render(currentProducts, currentPagination));
+/** Feature 2 : filter by brand
+ * 
+ */
+
+ selectBrand.addEventListener('change', async (event) => {
+  var products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize);
+  if (event.target.value == "show all brands") {
+      products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize)}
+  else {
+      products.result = products.result.filter(item => item.brand == event.target.value)}
+    setCurrentProducts(products);
+    render(currentProducts, currentPagination);
+});
+
+/** Feature 3 : Filter by reasonnable price
+ * 
+ */
+
+ selectByReasonnablePrice.addEventListener('change', async (event) => {
+  const products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize);
+  if (event.target.value == "By reasonable price"){
+    products.result = products.result.filter(product => product.price <= 50);
+  }
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+
+});
+
+/** Feature 4 : Filter by recently released
+ * 
+ */
+
+ function recentlyReleased(product_date){
+  let now = new Date();
+  product_date = new Date(product_date);
+  return now - product_date;
+}
+
+
+selectByRecentlyReleased.addEventListener('change', async (event) => {
+  const products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize);
+
+  if (event.target.value == "By recently released"){
+    products.result = products.result.filter(product => recentlyReleased(product.released) <= (24 * 60 * 60 * 1000 * 14));
+  }
+
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+
+});
+
+/** Feature 5 & 6 : Sort by date and price (asc and desc)
+ * 
+ */
+
+selectSort.addEventListener('change', async (event) => {
+  switch (event.target.value) {
+    case 'price-asc':
+      currentProducts = currentProducts.sort((p1, p2) => { return p1.price - p2.price; });
+      break;
+    case 'price-desc':
+      currentProducts = currentProducts.sort((p1, p2) => { return p2.price - p1.price; });
+      break;
+    case 'date-asc':
+      currentProducts = currentProducts.sort((p1, p2) => { return new Date(p2.released) - new Date(p1.released); });
+      break;
+    case 'date-desc':
+      currentProducts = currentProducts.sort((p1, p2) => { return new Date(p1.released) - new Date(p2.released); });
+      break;
+    default:
+      break;
+  }
+  render(currentProducts, currentPagination);
 });
