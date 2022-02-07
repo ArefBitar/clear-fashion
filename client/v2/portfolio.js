@@ -234,3 +234,25 @@ selectSort.addEventListener('change', async (event) => {
   }
   render(currentProducts, currentPagination);
 });
+
+// Feature 13 - Save as favorite 
+
+btn.addEventListener("click", async() => {
+  //console.log("hello");
+  //console.log(listOfItemsForAddingInFavorite.value);
+  favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  //console.log(favorites);
+  let productToAddFav = favorites.find(product => product.uuid == listOfItemsForAddingInFavorite.value);
+
+  if (productToAddFav === undefined) {
+    const products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize);
+    productToAddFav = products.result.find(product => product.uuid == listOfItemsForAddingInFavorite.value);
+
+    favorites.push(productToAddFav);
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    window.alert(`Le produit ${productToAddFav.name} de la marque ${productToAddFav.brand} vient d'être ajouté à vos favoris.`);
+  }
+  else{
+    window.alert(`Le produit ${productToAddFav.name} de la marque ${productToAddFav.brand} a déjà été ajouté à vos favoris.`)
+  }
+})
