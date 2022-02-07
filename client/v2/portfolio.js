@@ -237,11 +237,8 @@ selectSort.addEventListener('change', async (event) => {
 
 // Feature 13 - Save as favorite 
 
-btn.addEventListener("click", async() => {
-  //console.log("hello");
-  //console.log(listOfItemsForAddingInFavorite.value);
+btn.addEventListener("click", async() => { 
   favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-  //console.log(favorites);
   let productToAddFav = favorites.find(product => product.uuid == listOfItemsForAddingInFavorite.value);
 
   if (productToAddFav === undefined) {
